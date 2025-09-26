@@ -6,7 +6,7 @@ const App = () => {
   const [name, setName] = useState("")
   const [surname, setSurname] = useState("")
 
-  const handelAdd = (() => {
+  const handleAdd = (() => {
     try {
       axios.post('http://localhost:8080/send-data', { name, surname })
         .then(res => {
@@ -22,7 +22,7 @@ const App = () => {
     <div>
       <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
       <input type="text" value={surname} onChange={(e) => setSurname(e.target.value)} />
-      <button onClick={handelAdd}>Add</button>
+      <button onClick={handleAdd}>Add</button>
     </div>
   )
 }

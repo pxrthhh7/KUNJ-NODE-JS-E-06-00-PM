@@ -5,5 +5,5 @@ const app = http.createServer((req, res) => {
 })
 
 app.listen(8080, () => {
-    console.log("Server Started !!!")
+    console.log("Server is Started !!!")
 })
