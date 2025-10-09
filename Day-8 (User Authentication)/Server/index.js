@@ -1,6 +1,7 @@
 const express = require("express")
 const cors = require("cors")
 const mongoose = require("mongoose")
+const bcrypt = require("bcrypt")
 const app = express()
 const authModel = require("./Models/Auth")
 
@@ -22,7 +23,9 @@ app.post("/signup", async (req, res) => {
         res.json({ message: "User already exist !" })
     }
     else {
-        const newUser = await authModel.create({ name, email, password })
+
+        const hashedPassword = await bcrypt.hash(password, 10)
+        const newUser = await authModel.create({ name, email, password: hashedPassword })
         newUser.save()
         res.json({ message: "User Created !" })
     }
@@ -38,16 +41,16 @@ app.post("/login", async (req, res) => {
     const existingUser = await authModel.findOne({ email })
 
     if (!existingUser) {
-
         res.json({ message: "User not exist !" })
     }
     else {
-
-        if (existingUser.password === password) {
-            res.json({ message: `Welcome ${existingUser.name}` })
+        const comparedPass = await bcrypt.compare(password,existingUser.password)
+        const userName = existingUser.name
+        if (!comparedPass) {
+            res.json({ message: "Email and Password Does not match !" })
         }
         else {
-            res.json({ message: "Email and Password Does not match !" })
+            res.json({ message: `Welcome ${existingUser.name}`, userName })
         }
     }
 })
