@@ -1,12 +1,15 @@
 import React from "react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios"
+import Cookies from "js-cookie"
 
 const Login = () => {
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+
+    const navigate = useNavigate()
 
     const handelLogin = ((e) => {
 
@@ -15,7 +18,12 @@ const Login = () => {
         axios.post("http://localhost:8080/login", { email, password })
             .then((res) => {
                 alert(res.data.message)
-                localStorage.setItem("userName",res.data.userName)
+                if (res.data.token) {
+                    const token = res.data.token
+                    localStorage.setItem("userName", res.data.userName)
+                    Cookies.set("token",token, { expires : 1/24 })
+                    navigate("/user")
+                }
                 setEmail("")
                 setPassword("")
             })

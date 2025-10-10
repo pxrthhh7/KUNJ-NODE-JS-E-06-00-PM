@@ -2,6 +2,7 @@ const express = require("express")
 const cors = require("cors")
 const mongoose = require("mongoose")
 const bcrypt = require("bcrypt")
+const jwt = require("jsonwebtoken")
 const app = express()
 const authModel = require("./Models/Auth")
 
@@ -44,13 +45,15 @@ app.post("/login", async (req, res) => {
         res.json({ message: "User not exist !" })
     }
     else {
-        const comparedPass = await bcrypt.compare(password,existingUser.password)
-        const userName = existingUser.name
-        if (!comparedPass) {
-            res.json({ message: "Email and Password Does not match !" })
+        const comparedPass = await bcrypt.compare(password, existingUser.password)
+
+        if (comparedPass) {
+            const userName = existingUser.name
+            const token = await jwt.sign({ id: existingUser._id }, "demo@rnw", { expiresIn: "1h" })
+            res.json({ message: `Welcome ${existingUser.name}`, userName, token })
         }
         else {
-            res.json({ message: `Welcome ${existingUser.name}`, userName })
+            res.json({ message: "Email and Password Does not match !" })
         }
     }
 })
