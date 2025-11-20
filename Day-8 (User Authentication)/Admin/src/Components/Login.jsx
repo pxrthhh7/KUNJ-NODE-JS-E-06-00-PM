@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios"
@@ -9,6 +9,12 @@ const Login = () => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
+    // useEffect(() => {
+    //     Cookies.remove("token");
+    //     Cookies.remove("adminToken");
+    //     Cookies.remove("superadmin");
+    // })
+
     const navigate = useNavigate()
 
     const handelLogin = ((e) => {
@@ -18,11 +24,26 @@ const Login = () => {
         axios.post("http://localhost:8080/login", { email, password })
             .then((res) => {
                 alert(res.data.message)
-                if (res.data.token) {
+
+                if (res.data.adminToken) {
+                    const adminToken = res.data.adminToken
+                    localStorage.setItem("userName", res.data.userName)
+                    Cookies.set("adminToken", adminToken, { expires: 1 / 24 })
+                    navigate("/admin")
+                }
+                else if (res.data.superToken) {
+                    const superToken = res.data.superToken
+                    Cookies.set("superToken", superToken, { expires: 1 / 24 })
+                    navigate("/superadmin")
+                }
+                else if (res.data.token) {
                     const token = res.data.token
                     localStorage.setItem("userName", res.data.userName)
-                    Cookies.set("token",token, { expires : 1/24 })
+                    Cookies.set("token", token, { expires: 1 / 24 })
                     navigate("/user")
+                }
+                else {
+                    alert(res.data.message);
                 }
                 setEmail("")
                 setPassword("")
@@ -63,15 +84,9 @@ const Login = () => {
                     </div>
 
                     <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center space-x-2">
-                            <input type="checkbox" id="remember" className="accent-[#81D4FA]" />
-                            <label htmlFor="remember" className="text-gray-600">
-                                Remember me
-                            </label>
-                        </div>
-                        <a href="#" className="text-[#5C6BC0] hover:underline">
+                        <Link to="/forget" className="text-[#5C6BC0] hover:underline">
                             Forgot password?
-                        </a>
+                        </Link>
                     </div>
 
                     <button
